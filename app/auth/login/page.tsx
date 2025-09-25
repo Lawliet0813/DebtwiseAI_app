@@ -75,6 +75,11 @@ export default function LoginPage() {
                   className="bg-white/10 border-white/20 text-white placeholder:text-gray-300"
                 />
               </div>
+              <div className="flex justify-end">
+                <Link href="/auth/forgot-password" className="text-sm text-blue-300 hover:text-blue-200">
+                  忘記密碼？
+                </Link>
+              </div>
               {error && <div className="text-red-300 text-sm bg-red-500/20 p-3 rounded-lg">{error}</div>}
               <Button
                 type="submit"
