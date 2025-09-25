@@ -25,9 +25,9 @@ export interface AppNavItem {
 
 export const navItems: AppNavItem[] = [
   {
-    href: "/",
-    label: "總覽",
-    description: "掌握財務概況",
+    href: "/dashboard",
+    label: "儀表板",
+    description: "即時掌握財務健康",
     icon: LayoutDashboard,
     emoji: "📊",
   },
