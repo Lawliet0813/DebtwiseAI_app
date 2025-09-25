@@ -1,6 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Inter, JetBrains_Mono } from "next/font/google"
+import { Inter, JetBrains_Mono, Noto_Sans_TC } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import "./globals.css"
@@ -13,8 +13,14 @@ const inter = Inter({
 })
 
 const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono", 
+  variable: "--font-jetbrains-mono",
   subsets: ["latin"],
+})
+
+const notoSansTc = Noto_Sans_TC({
+  variable: "--font-noto-sans-tc",
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
 })
 
 export const metadata: Metadata = {
@@ -31,11 +37,11 @@ export default function RootLayout({
   return (
     <html lang="zh-TW" className="dark">
       <body
-        className={`${inter.variable} ${jetbrainsMono.variable} bg-background font-sans antialiased text-foreground`}
+        className={`${inter.variable} ${notoSansTc.variable} ${jetbrainsMono.variable} bg-background font-sans antialiased text-foreground`}
       >
         <TopNav notificationCount={0} />
         <Suspense fallback={null}>
-          <div className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.18),_transparent_60%)] pt-20">
+          <div className="min-h-screen pt-20">
             {children}
           </div>
           <GlobalAddDebtDialog />
