@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import "./globals.css"
 import { GlobalAddDebtDialog } from "@/components/debts/global-add-debt-dialog"
+import TopNav from "@/components/TopNav"
 
 const inter = Inter({
   variable: "--font-inter",
@@ -29,11 +30,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-TW">
-      <body
-        className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}
-      >
+      <body className={`${inter.variable} ${jetbrainsMono.variable} bg-slate-950 font-sans antialiased text-white`}>
+        <TopNav notificationCount={0} />
         <Suspense fallback={null}>
-          {children}
+          <div className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.12),_transparent_55%)] pt-20">
+            {children}
+          </div>
           <GlobalAddDebtDialog />
           <Analytics />
         </Suspense>
