@@ -4,6 +4,7 @@ import { Inter, JetBrains_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import "./globals.css"
+import { GlobalAddDebtDialog } from "@/components/debts/global-add-debt-dialog"
 
 const inter = Inter({
   variable: "--font-inter",
@@ -28,9 +29,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-TW">
-      <body className={\`font-sans \${inter.variable} \${jetbrainsMono.variable} antialiased\`}>
+      <body className={`font-sans ${inter.variable} ${jetbrainsMono.variable} antialiased`}>
         <Suspense fallback={null}>
           {children}
+          <GlobalAddDebtDialog />
           <Analytics />
         </Suspense>
       </body>

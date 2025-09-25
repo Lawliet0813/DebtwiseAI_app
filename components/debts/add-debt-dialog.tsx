@@ -63,8 +63,8 @@ export function AddDebtDialog({ open, onOpenChange, onSuccess }: AddDebtDialogPr
         description: "",
       })
 
-      onOpenChange(false)
       onSuccess?.()
+      onOpenChange(false)
     } catch (err) {
       setError(err instanceof Error ? err.message : "未知錯誤")
     } finally {

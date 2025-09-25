@@ -5,8 +5,7 @@ import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Calendar, AlertCircle, Plus, DollarSign, BarChart3, Target } from "lucide-react"
-import { useState, useEffect } from "react"
-import { AddDebtDialog } from "@/components/debts/add-debt-dialog"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { AddPaymentDialog } from "@/components/payments/add-payment-dialog"
 import Link from "next/link"
 
@@ -44,13 +43,16 @@ export function DashboardOverview() {
   const [data, setData] = useState<DashboardData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [showAddDebt, setShowAddDebt] = useState(false)
   const [showAddPayment, setShowAddPayment] = useState(false)
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async ({ silent = false }: { silent?: boolean } = {}) => {
     try {
-      setIsLoading(true)
-      const response = await fetch("/api/dashboard")
+      if (!silent) {
+        setIsLoading(true)
+        setError(null)
+      }
+
+      const response = await fetch("/api/dashboard", { cache: "no-store" })
       const result = await response.json()
 
       if (!response.ok) {
@@ -58,17 +60,98 @@ export function DashboardOverview() {
       }
 
       setData(result)
+      if (typeof window !== "undefined") {
+        window.sessionStorage.setItem("dashboard-cache", JSON.stringify(result))
+      }
       setError(null)
     } catch (err) {
-      setError(err instanceof Error ? err.message : "未知錯誤")
+      const message = err instanceof Error ? err.message : "未知錯誤"
+
+      if (silent) {
+        console.error("更新儀表板資料失敗", err)
+        return
+      }
+
+      setError(message)
     } finally {
-      setIsLoading(false)
+      if (!silent) {
+        setIsLoading(false)
+      }
     }
-  }
+  }, [])
 
   useEffect(() => {
-    fetchDashboardData()
+    let hasCache = false
+
+    if (typeof window !== "undefined") {
+      const cachedData = window.sessionStorage.getItem("dashboard-cache")
+
+      if (cachedData) {
+        try {
+          const parsed: DashboardData = JSON.parse(cachedData)
+          setData(parsed)
+          setIsLoading(false)
+          hasCache = true
+        } catch (error) {
+          console.error("載入快取資料失敗", error)
+          window.sessionStorage.removeItem("dashboard-cache")
+        }
+      }
+    }
+
+    fetchDashboardData({ silent: hasCache })
+  }, [fetchDashboardData])
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined
+    }
+
+    const handleDebtAdded = () => {
+      fetchDashboardData({ silent: true })
+    }
+
+    window.addEventListener("debt-added", handleDebtAdded)
+    return () => {
+      window.removeEventListener("debt-added", handleDebtAdded)
+    }
+  }, [fetchDashboardData])
+
+  const openAddDebtDialog = useCallback(() => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("open-add-debt"))
+    }
   }, [])
+
+  const quickActions = useMemo(
+    () => [
+      {
+        icon: Plus,
+        title: "新增債務",
+        description: "記錄新的債務項目",
+        onClick: openAddDebtDialog,
+      },
+      {
+        icon: DollarSign,
+        title: "記錄還款",
+        description: "更新還款進度",
+        onClick: () => setShowAddPayment(true),
+      },
+      {
+        icon: BarChart3,
+        title: "查看報表",
+        description: "分析財務狀況",
+        href: "/reports",
+      },
+      {
+        icon: Target,
+        title: "設定目標",
+        description: "制定還款策略",
+        href: "/strategy",
+      },
+    ],
+    [openAddDebtDialog, setShowAddPayment],
+  )
 
   if (isLoading) {
     return (
@@ -115,33 +198,6 @@ export function DashboardOverview() {
       return diffDays <= 7 && diffDays >= 0
     })
     .sort((a, b) => new Date(a.due_date!).getTime() - new Date(b.due_date!).getTime())
-
-  const quickActions = [
-    {
-      icon: Plus,
-      title: "新增債務",
-      description: "記錄新的債務項目",
-      onClick: () => setShowAddDebt(true),
-    },
-    {
-      icon: DollarSign,
-      title: "記錄還款",
-      description: "更新還款進度",
-      onClick: () => setShowAddPayment(true),
-    },
-    {
-      icon: BarChart3,
-      title: "查看報表",
-      description: "分析財務狀況",
-      href: "/reports",
-    },
-    {
-      icon: Target,
-      title: "設定目標",
-      description: "制定還款策略",
-      href: "/strategy",
-    },
-  ]
 
   return (
     <>
@@ -303,8 +359,11 @@ export function DashboardOverview() {
       </div>
 
       {/* Dialogs */}
-      <AddDebtDialog open={showAddDebt} onOpenChange={setShowAddDebt} onSuccess={fetchDashboardData} />
-      <AddPaymentDialog open={showAddPayment} onOpenChange={setShowAddPayment} onSuccess={fetchDashboardData} />
+      <AddPaymentDialog
+        open={showAddPayment}
+        onOpenChange={setShowAddPayment}
+        onSuccess={() => fetchDashboardData({ silent: true })}
+      />
     </>
   )
 }
