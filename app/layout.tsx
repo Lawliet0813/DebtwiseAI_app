@@ -29,11 +29,13 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="zh-TW">
-      <body className={`${inter.variable} ${jetbrainsMono.variable} bg-slate-950 font-sans antialiased text-white`}>
+    <html lang="zh-TW" className="dark">
+      <body
+        className={`${inter.variable} ${jetbrainsMono.variable} bg-background font-sans antialiased text-foreground`}
+      >
         <TopNav notificationCount={0} />
         <Suspense fallback={null}>
-          <div className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.12),_transparent_55%)] pt-20">
+          <div className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.18),_transparent_60%)] pt-20">
             {children}
           </div>
           <GlobalAddDebtDialog />
