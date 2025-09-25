@@ -42,18 +42,22 @@ function oneRun(input: PlanInput, strategy: "snowball" | "avalanche"): PlanResul
       const minPay = Math.min(d.minimum, d.balance + interest);
 
       let pay = Math.min(minPay, budget);
-      budget -= pay;
+      pay = Math.max(0, +pay.toFixed(10));
+      budget = +(budget - pay).toFixed(10);
 
-      const interestPortion = Math.min(interest, pay);
-      const principalPortion = Math.max(0, pay - interestPortion);
-      d.balance = Math.max(0, d.balance + interest - pay);
+      const interestPortion = interest;
+      const principalPortionRaw = +(pay - interestPortion).toFixed(10);
+      const principalPortion = Math.abs(principalPortionRaw) < EPS ? 0 : principalPortionRaw;
+      d.balance = Math.max(0, +(d.balance + interest - pay).toFixed(10));
+
+      const remaining = Math.abs(d.balance) < EPS ? 0 : d.balance;
 
       allocs.push({
         debtId: d.id,
         pay,
         interest: interestPortion,
         principal: principalPortion,
-        remaining: d.balance
+        remaining
       });
       totalInterest += interestPortion;
     }
@@ -66,13 +70,15 @@ function oneRun(input: PlanInput, strategy: "snowball" | "avalanche"): PlanResul
       if (d.balance <= EPS) break;
 
       const extraPay = Math.min(d.balance, budget);
-      budget -= extraPay;
+      budget = +(budget - extraPay).toFixed(10);
       d.balance = Math.max(0, d.balance - extraPay);
 
       const row = allocs.find(x => x.debtId === d.id)!;
-      row.pay += extraPay;
-      row.principal += extraPay;
-      row.remaining = d.balance;
+      row.pay = +(row.pay + extraPay).toFixed(10);
+      const updatedPrincipal = +(row.principal + extraPay).toFixed(10);
+      row.principal = Math.abs(updatedPrincipal) < EPS ? 0 : updatedPrincipal;
+      const updatedRemaining = +(d.balance).toFixed(10);
+      row.remaining = Math.abs(updatedRemaining) < EPS ? 0 : updatedRemaining;
     }
 
     const totalPaidThisMonth = allocs.reduce((s, a) => s + a.pay, 0);
