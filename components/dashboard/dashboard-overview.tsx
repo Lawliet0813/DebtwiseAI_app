@@ -204,25 +204,29 @@ export function DashboardOverview() {
       <div className="space-y-6">
         {/* Main Debt Overview Card */}
         <Card className="glass p-6 bg-gradient-to-r from-purple-600 to-blue-600 text-white border-0">
-          <div className="grid grid-cols-3 gap-4 mb-4">
+          <div className="grid grid-cols-1 gap-4 mb-6 sm:grid-cols-3">
             <div className="text-center">
-              <div className="text-2xl font-bold">NT${summary.totalDebt.toLocaleString()}</div>
+              <div className="text-3xl font-bold sm:text-2xl">
+                NT${summary.totalDebt.toLocaleString()}
+              </div>
               <div className="text-sm text-white/80">總債務</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold">NT${summary.monthlyPaid.toLocaleString()}</div>
+              <div className="text-3xl font-bold sm:text-2xl">
+                NT${summary.monthlyPaid.toLocaleString()}
+              </div>
               <div className="text-sm text-white/80">本月已付</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold">{summary.debtCount}</div>
+              <div className="text-3xl font-bold sm:text-2xl">{summary.debtCount}</div>
               <div className="text-sm text-white/80">債務項目</div>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>本月還款進度</span>
-              <span>{payoffProgress.toFixed(1)}%</span>
+          <div className="space-y-3">
+            <div className="flex flex-col gap-1 text-sm sm:flex-row sm:items-center sm:justify-between">
+              <span className="text-white/80">本月還款進度</span>
+              <span className="font-semibold">{payoffProgress.toFixed(1)}%</span>
             </div>
             <Progress value={payoffProgress} className="h-3 bg-white/20" />
             <div className="text-xs text-white/70">
@@ -237,13 +241,13 @@ export function DashboardOverview() {
             <span>⚡</span>
             快速操作
           </h2>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid gap-4 sm:grid-cols-2">
             {quickActions.map((action, index) => {
               const ActionIcon = action.icon
               const content = (
                 <Card
                   key={index}
-                  className="glass p-4 hover:scale-105 transition-transform duration-200 cursor-pointer"
+                  className="glass p-4 hover:scale-[1.02] transition-transform duration-200 cursor-pointer"
                 >
                   <div className="text-center space-y-2">
                     <ActionIcon className="h-8 w-8 mx-auto text-purple-600" />
