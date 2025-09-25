@@ -28,7 +28,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-TW">
-      <body className={\`font-sans \${inter.variable} \${jetbrainsMono.variable} antialiased\`}>
+      <body
+        className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}
+      >
         <Suspense fallback={null}>
           {children}
           <Analytics />
