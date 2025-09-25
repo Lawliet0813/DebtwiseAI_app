@@ -89,7 +89,7 @@ export function AddPaymentDialog({ open, onOpenChange, onSuccess }: AddPaymentDi
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>記錄還款</DialogTitle>
+          <DialogTitle className="text-[#111827]">記錄還款</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
@@ -116,6 +116,7 @@ export function AddPaymentDialog({ open, onOpenChange, onSuccess }: AddPaymentDi
               value={formData.amount}
               onChange={(e) => setFormData({ ...formData, amount: Number(e.target.value) })}
               placeholder="0"
+              className="placeholder:text-[#6B7280]"
               required
             />
           </div>
@@ -155,6 +156,7 @@ export function AddPaymentDialog({ open, onOpenChange, onSuccess }: AddPaymentDi
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               placeholder="額外說明..."
+              className="placeholder:text-[#6B7280]"
               rows={3}
             />
           </div>
@@ -162,10 +164,19 @@ export function AddPaymentDialog({ open, onOpenChange, onSuccess }: AddPaymentDi
           {error && <div className="text-red-500 text-sm bg-red-50 p-3 rounded-lg">{error}</div>}
 
           <div className="flex justify-end gap-3">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              className="bg-gray-100 text-gray-700 hover:bg-gray-200"
+              onClick={() => onOpenChange(false)}
+            >
               取消
             </Button>
-            <Button type="submit" disabled={isLoading || !formData.debt_id}>
+            <Button
+              type="submit"
+              className="bg-indigo-600 text-white hover:bg-indigo-700"
+              disabled={isLoading || !formData.debt_id}
+            >
               {isLoading ? "記錄中..." : "記錄還款"}
             </Button>
           </div>

@@ -131,8 +131,8 @@ export function AddDebtModal({ isOpen, onClose, onAdd }: AddDebtModalProps) {
     <Dialog open={isOpen} onOpenChange={handleDialogChange}>
       <DialogContent className="glass max-w-md mx-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center justify-between">
-            <span className="gradient-text">新增債務項目</span>
+          <DialogTitle className="flex items-center justify-between text-[#111827]">
+            <span className="font-semibold text-[#111827]">新增債務項目</span>
             <Button variant="ghost" size="icon" onClick={handleRequestClose} disabled={isSubmitting}>
               <X className="h-4 w-4" />
             </Button>
@@ -146,8 +146,8 @@ export function AddDebtModal({ isOpen, onClose, onAdd }: AddDebtModalProps) {
               id="debt-name"
               value={formData.name}
               onChange={(event) => handleInputChange("name", event.target.value)}
-              placeholder="例如：信用卡 A"
-              className="w-full focus:ring-purple-500"
+              placeholder="例如：信用卡A"
+              className="w-full focus:ring-purple-500 placeholder:text-[#6B7280]"
               disabled={isSubmitting}
               required
             />
@@ -183,7 +183,7 @@ export function AddDebtModal({ isOpen, onClose, onAdd }: AddDebtModalProps) {
               value={formData.total_amount ? String(formData.total_amount) : ""}
               onChange={(event) => handleNumberChange("total_amount", event.target.value)}
               placeholder="請輸入原始貸款金額"
-              className="w-full focus:ring-purple-500"
+              className="w-full focus:ring-purple-500 placeholder:text-[#6B7280]"
               disabled={isSubmitting}
             />
             <p className="text-xs text-gray-500">若未填寫，系統將以目前餘額作為原始金額。</p>
@@ -198,7 +198,7 @@ export function AddDebtModal({ isOpen, onClose, onAdd }: AddDebtModalProps) {
               value={formData.current_balance ? String(formData.current_balance) : ""}
               onChange={(event) => handleNumberChange("current_balance", event.target.value)}
               placeholder="請輸入目前尚未償還金額"
-              className="w-full focus:ring-purple-500"
+              className="w-full focus:ring-purple-500 placeholder:text-[#6B7280]"
               disabled={isSubmitting}
               required
             />
@@ -214,7 +214,7 @@ export function AddDebtModal({ isOpen, onClose, onAdd }: AddDebtModalProps) {
               value={formData.interest_rate ? String(formData.interest_rate) : ""}
               onChange={(event) => handleNumberChange("interest_rate", event.target.value)}
               placeholder="例如：3.5"
-              className="w-full focus:ring-purple-500"
+              className="w-full focus:ring-purple-500 placeholder:text-[#6B7280]"
               disabled={isSubmitting}
             />
           </div>
@@ -228,7 +228,7 @@ export function AddDebtModal({ isOpen, onClose, onAdd }: AddDebtModalProps) {
               value={formData.minimum_payment ? String(formData.minimum_payment) : ""}
               onChange={(event) => handleNumberChange("minimum_payment", event.target.value)}
               placeholder="請輸入每月最低還款額"
-              className="w-full focus:ring-purple-500"
+              className="w-full focus:ring-purple-500 placeholder:text-[#6B7280]"
               disabled={isSubmitting}
             />
           </div>
@@ -252,7 +252,7 @@ export function AddDebtModal({ isOpen, onClose, onAdd }: AddDebtModalProps) {
               value={formData.description ?? ""}
               onChange={(event) => handleInputChange("description", event.target.value)}
               placeholder="可紀錄債務來源、還款提醒等資訊"
-              className="w-full focus:ring-purple-500"
+              className="w-full focus:ring-purple-500 placeholder:text-[#6B7280]"
               disabled={isSubmitting}
               rows={3}
             />
@@ -260,7 +260,7 @@ export function AddDebtModal({ isOpen, onClose, onAdd }: AddDebtModalProps) {
 
           <Button
             type="submit"
-            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 hover:scale-105 transition-transform duration-200"
+            className="w-full bg-indigo-600 text-white hover:bg-indigo-700"
             disabled={isSubmitting}
           >
             {isSubmitting ? "新增中..." : "新增債務"}

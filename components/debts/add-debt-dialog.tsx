@@ -76,7 +76,7 @@ export function AddDebtDialog({ open, onOpenChange, onSuccess }: AddDebtDialogPr
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>新增債務</DialogTitle>
+          <DialogTitle className="text-[#111827]">新增債務</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
@@ -86,6 +86,7 @@ export function AddDebtDialog({ open, onOpenChange, onSuccess }: AddDebtDialogPr
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               placeholder="例如：信用卡A"
+              className="placeholder:text-[#6B7280]"
               required
             />
           </div>
@@ -116,6 +117,7 @@ export function AddDebtDialog({ open, onOpenChange, onSuccess }: AddDebtDialogPr
                 value={formData.total_amount}
                 onChange={(e) => setFormData({ ...formData, total_amount: Number(e.target.value) })}
                 placeholder="0"
+                className="placeholder:text-[#6B7280]"
                 required
               />
             </div>
@@ -127,6 +129,7 @@ export function AddDebtDialog({ open, onOpenChange, onSuccess }: AddDebtDialogPr
                 value={formData.current_balance}
                 onChange={(e) => setFormData({ ...formData, current_balance: Number(e.target.value) })}
                 placeholder="0"
+                className="placeholder:text-[#6B7280]"
                 required
               />
             </div>
@@ -142,6 +145,7 @@ export function AddDebtDialog({ open, onOpenChange, onSuccess }: AddDebtDialogPr
                 value={formData.interest_rate}
                 onChange={(e) => setFormData({ ...formData, interest_rate: Number(e.target.value) })}
                 placeholder="0.00"
+                className="placeholder:text-[#6B7280]"
                 required
               />
             </div>
@@ -153,6 +157,7 @@ export function AddDebtDialog({ open, onOpenChange, onSuccess }: AddDebtDialogPr
                 value={formData.minimum_payment}
                 onChange={(e) => setFormData({ ...formData, minimum_payment: Number(e.target.value) })}
                 placeholder="0"
+                className="placeholder:text-[#6B7280]"
                 required
               />
             </div>
@@ -175,6 +180,7 @@ export function AddDebtDialog({ open, onOpenChange, onSuccess }: AddDebtDialogPr
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="額外說明..."
+              className="placeholder:text-[#6B7280]"
               rows={3}
             />
           </div>
@@ -182,10 +188,15 @@ export function AddDebtDialog({ open, onOpenChange, onSuccess }: AddDebtDialogPr
           {error && <div className="text-red-500 text-sm bg-red-50 p-3 rounded-lg">{error}</div>}
 
           <div className="flex justify-end gap-3">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              className="bg-gray-100 text-gray-700 hover:bg-gray-200"
+              onClick={() => onOpenChange(false)}
+            >
               取消
             </Button>
-            <Button type="submit" disabled={isLoading}>
+            <Button type="submit" className="bg-indigo-600 text-white hover:bg-indigo-700" disabled={isLoading}>
               {isLoading ? "建立中..." : "建立債務"}
             </Button>
           </div>
