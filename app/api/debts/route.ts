@@ -2,6 +2,9 @@ import { createClient } from "@/lib/supabase/server"
 import { type NextRequest, NextResponse } from "next/server"
 import type { DebtFormData } from "@/lib/types/database"
 
+export const runtime = "nodejs"
+export const dynamic = "force-dynamic"
+
 export async function GET() {
   try {
     const supabase = await createClient()

@@ -6,6 +6,9 @@ import {
   calculateWeightedInterestRate,
 } from "@/lib/utils/debt-calculations"
 
+export const runtime = "nodejs"
+export const dynamic = "force-dynamic"
+
 export async function GET() {
   try {
     const supabase = await createClient()
