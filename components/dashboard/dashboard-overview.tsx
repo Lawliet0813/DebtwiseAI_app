@@ -5,10 +5,10 @@ import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Calendar, AlertCircle, Plus, DollarSign, BarChart3, Target } from "lucide-react"
-import { useState, useEffect } from "react"
-import { AddDebtDialog } from "@/components/debts/add-debt-dialog"
+import { useState, useEffect, useCallback, useMemo, useRef } from "react"
 import { AddPaymentDialog } from "@/components/payments/add-payment-dialog"
 import Link from "next/link"
+import { DEBT_ADDED_EVENT, triggerOpenAddDebt } from "@/lib/debts/events"
 
 interface DashboardData {
   summary: {
@@ -40,17 +40,37 @@ interface DashboardData {
   }>
 }
 
+const DASHBOARD_CACHE_KEY = "dashboard-cache"
+const DASHBOARD_CACHE_TTL = 1000 * 60 * 2 // 2 minutes
+
+type DashboardCachePayload = {
+  data: DashboardData
+  timestamp: number
+}
+
 export function DashboardOverview() {
   const [data, setData] = useState<DashboardData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [showAddDebt, setShowAddDebt] = useState(false)
   const [showAddPayment, setShowAddPayment] = useState(false)
 
-  const fetchDashboardData = async () => {
+  const abortControllerRef = useRef<AbortController | null>(null)
+
+  const fetchDashboardData = useCallback(async ({ silent = false }: { silent?: boolean } = {}) => {
+    abortControllerRef.current?.abort()
+    const controller = new AbortController()
+    abortControllerRef.current = controller
+
     try {
-      setIsLoading(true)
-      const response = await fetch("/api/dashboard")
+      if (!silent) {
+        setIsLoading(true)
+        setError(null)
+      }
+
+      const response = await fetch("/api/dashboard", {
+        cache: "no-store",
+        signal: controller.signal,
+      })
       const result = await response.json()
 
       if (!response.ok) {
@@ -58,17 +78,115 @@ export function DashboardOverview() {
       }
 
       setData(result)
+      if (typeof window !== "undefined") {
+        const payload: DashboardCachePayload = {
+          data: result,
+          timestamp: Date.now(),
+        }
+        window.sessionStorage.setItem(DASHBOARD_CACHE_KEY, JSON.stringify(payload))
+      }
       setError(null)
     } catch (err) {
-      setError(err instanceof Error ? err.message : "未知錯誤")
+      if (err instanceof DOMException && err.name === "AbortError") {
+        return
+      }
+      const message = err instanceof Error ? err.message : "未知錯誤"
+
+      if (silent) {
+        console.error("更新儀表板資料失敗", err)
+        return
+      }
+
+      setError(message)
     } finally {
-      setIsLoading(false)
+      if (!silent && abortControllerRef.current === controller) {
+        setIsLoading(false)
+      }
     }
-  }
+  }, [])
 
   useEffect(() => {
-    fetchDashboardData()
+    let hasCache = false
+
+    if (typeof window !== "undefined") {
+      const cachedData = window.sessionStorage.getItem(DASHBOARD_CACHE_KEY)
+
+      if (cachedData) {
+        try {
+          const parsed: DashboardCachePayload = JSON.parse(cachedData)
+          const isFresh = Date.now() - parsed.timestamp < DASHBOARD_CACHE_TTL
+
+          if (isFresh) {
+            setData(parsed.data)
+            setIsLoading(false)
+            hasCache = true
+          } else {
+            window.sessionStorage.removeItem(DASHBOARD_CACHE_KEY)
+          }
+        } catch (error) {
+          console.error("載入快取資料失敗", error)
+          window.sessionStorage.removeItem(DASHBOARD_CACHE_KEY)
+        }
+      }
+    }
+
+    fetchDashboardData({ silent: hasCache })
+  }, [fetchDashboardData])
+
+  useEffect(() => {
+    return () => {
+      abortControllerRef.current?.abort()
+    }
   }, [])
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined
+    }
+
+    const handleDebtAdded = () => {
+      fetchDashboardData({ silent: true })
+    }
+
+    window.addEventListener(DEBT_ADDED_EVENT, handleDebtAdded)
+    return () => {
+      window.removeEventListener(DEBT_ADDED_EVENT, handleDebtAdded)
+    }
+  }, [fetchDashboardData])
+
+  const openAddDebtDialog = useCallback(() => {
+    triggerOpenAddDebt()
+  }, [])
+
+  const quickActions = useMemo(
+    () => [
+      {
+        icon: Plus,
+        title: "新增債務",
+        description: "記錄新的債務項目",
+        onClick: openAddDebtDialog,
+      },
+      {
+        icon: DollarSign,
+        title: "記錄還款",
+        description: "更新還款進度",
+        onClick: () => setShowAddPayment(true),
+      },
+      {
+        icon: BarChart3,
+        title: "查看報表",
+        description: "分析財務狀況",
+        href: "/reports",
+      },
+      {
+        icon: Target,
+        title: "設定目標",
+        description: "制定還款策略",
+        href: "/strategy",
+      },
+    ],
+    [openAddDebtDialog, setShowAddPayment],
+  )
 
   if (isLoading) {
     return (
@@ -98,7 +216,7 @@ export function DashboardOverview() {
 
   if (!data) return null
 
-  const { summary, debts, recentPayments, goals } = data
+  const { summary, debts, recentPayments } = data
 
   // 計算還款進度 (本月已付 / 最低還款)
   const payoffProgress =
@@ -115,33 +233,6 @@ export function DashboardOverview() {
       return diffDays <= 7 && diffDays >= 0
     })
     .sort((a, b) => new Date(a.due_date!).getTime() - new Date(b.due_date!).getTime())
-
-  const quickActions = [
-    {
-      icon: Plus,
-      title: "新增債務",
-      description: "記錄新的債務項目",
-      onClick: () => setShowAddDebt(true),
-    },
-    {
-      icon: DollarSign,
-      title: "記錄還款",
-      description: "更新還款進度",
-      onClick: () => setShowAddPayment(true),
-    },
-    {
-      icon: BarChart3,
-      title: "查看報表",
-      description: "分析財務狀況",
-      href: "/reports",
-    },
-    {
-      icon: Target,
-      title: "設定目標",
-      description: "制定還款策略",
-      href: "/strategy",
-    },
-  ]
 
   return (
     <>
@@ -303,8 +394,11 @@ export function DashboardOverview() {
       </div>
 
       {/* Dialogs */}
-      <AddDebtDialog open={showAddDebt} onOpenChange={setShowAddDebt} onSuccess={fetchDashboardData} />
-      <AddPaymentDialog open={showAddPayment} onOpenChange={setShowAddPayment} onSuccess={fetchDashboardData} />
+      <AddPaymentDialog
+        open={showAddPayment}
+        onOpenChange={setShowAddPayment}
+        onSuccess={() => fetchDashboardData({ silent: true })}
+      />
     </>
   )
 }

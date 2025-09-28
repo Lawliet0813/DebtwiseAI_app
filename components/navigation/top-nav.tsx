@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { Bell } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -10,15 +11,19 @@ export function TopNav() {
     <header className="sticky top-0 z-40 glass border-b border-white/20 px-4 py-3">
       <div className="flex items-center justify-between max-w-7xl mx-auto">
         {/* Brand Logo */}
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 flex items-center justify-center">
+        <Link
+          href="/"
+          aria-label="返回首頁"
+          className="group flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white/50 rounded-full px-1"
+        >
+          <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 flex items-center justify-center transition-transform duration-150 group-hover:scale-105">
             <span className="text-white font-bold text-lg">💰</span>
           </div>
           <div>
             <h1 className="font-bold text-lg gradient-text">DebtWise AI</h1>
             <p className="text-xs text-muted-foreground">智慧債務管理</p>
           </div>
-        </div>
+        </Link>
 
         {/* User Actions */}
         <div className="flex items-center gap-3">

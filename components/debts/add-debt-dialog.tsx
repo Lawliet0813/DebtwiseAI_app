@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,25 +11,53 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import type { DebtFormData } from "@/lib/types/database"
 
-interface AddDebtDialogProps {
+const DEFAULT_FORM_DATA: DebtFormData = {
+  name: "",
+  type: "credit_card",
+  total_amount: 0,
+  current_balance: 0,
+  interest_rate: 0,
+  minimum_payment: 0,
+  due_date: "",
+  description: "",
+}
+
+const createInitialFormState = (preset?: Partial<DebtFormData>): DebtFormData => ({
+  ...DEFAULT_FORM_DATA,
+  ...preset,
+})
+
+export interface AddDebtDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onSuccess?: () => void
+  initialValues?: Partial<DebtFormData>
 }
 
-export function AddDebtDialog({ open, onOpenChange, onSuccess }: AddDebtDialogProps) {
+export function AddDebtDialog({ open, onOpenChange, onSuccess, initialValues }: AddDebtDialogProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [formData, setFormData] = useState<DebtFormData>({
-    name: "",
-    type: "credit_card",
-    total_amount: 0,
-    current_balance: 0,
-    interest_rate: 0,
-    minimum_payment: 0,
-    due_date: "",
-    description: "",
-  })
+  const [formData, setFormData] = useState<DebtFormData>(() => createInitialFormState(initialValues))
+
+  useEffect(() => {
+    if (!open) {
+      return
+    }
+
+    setFormData(createInitialFormState(initialValues))
+    setError(null)
+    setIsLoading(false)
+  }, [open, initialValues])
+
+  useEffect(() => {
+    if (open) {
+      return
+    }
+
+    setFormData(createInitialFormState())
+    setError(null)
+    setIsLoading(false)
+  }, [open])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -52,19 +80,10 @@ export function AddDebtDialog({ open, onOpenChange, onSuccess }: AddDebtDialogPr
       }
 
       // 重置表單
-      setFormData({
-        name: "",
-        type: "credit_card",
-        total_amount: 0,
-        current_balance: 0,
-        interest_rate: 0,
-        minimum_payment: 0,
-        due_date: "",
-        description: "",
-      })
+      setFormData(createInitialFormState(initialValues))
 
-      onOpenChange(false)
       onSuccess?.()
+      onOpenChange(false)
     } catch (err) {
       setError(err instanceof Error ? err.message : "未知錯誤")
     } finally {
