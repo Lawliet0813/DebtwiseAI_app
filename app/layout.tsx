@@ -17,6 +17,8 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
 })
 
+// Use the officially supported latin subset for Noto Sans TC to avoid unsupported
+// zh-TW subset configuration issues in Next.js.
 const notoSansTc = Noto_Sans_TC({
   variable: "--font-noto-sans-tc",
   subsets: ["latin"],

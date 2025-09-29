@@ -179,6 +179,8 @@ export function AddDebtModal({ isOpen, onClose, onAdd }: AddDebtModalProps) {
             <Input
               id="total-amount"
               type="number"
+              min={0}
+              step="0.01"
               inputMode="decimal"
               value={formData.total_amount ? String(formData.total_amount) : ""}
               onChange={(event) => handleNumberChange("total_amount", event.target.value)}
@@ -194,6 +196,8 @@ export function AddDebtModal({ isOpen, onClose, onAdd }: AddDebtModalProps) {
             <Input
               id="current-balance"
               type="number"
+              min={0}
+              step="0.01"
               inputMode="decimal"
               value={formData.current_balance ? String(formData.current_balance) : ""}
               onChange={(event) => handleNumberChange("current_balance", event.target.value)}
@@ -209,6 +213,7 @@ export function AddDebtModal({ isOpen, onClose, onAdd }: AddDebtModalProps) {
             <Input
               id="interest-rate"
               type="number"
+              min={0}
               step="0.01"
               inputMode="decimal"
               value={formData.interest_rate ? String(formData.interest_rate) : ""}
@@ -224,6 +229,8 @@ export function AddDebtModal({ isOpen, onClose, onAdd }: AddDebtModalProps) {
             <Input
               id="minimum-payment"
               type="number"
+              min={0}
+              step="0.01"
               inputMode="decimal"
               value={formData.minimum_payment ? String(formData.minimum_payment) : ""}
               onChange={(event) => handleNumberChange("minimum_payment", event.target.value)}
